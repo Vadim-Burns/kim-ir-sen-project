@@ -4,7 +4,7 @@ import os
 import pyaes
 import base64
 import db
-from flask import request, abort
+from flask import request, abort, render_template
 
 app = Flask(__name__)
 # Must be 32 byte length
@@ -50,6 +50,19 @@ def _decrypt_text(key, text):
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
+
+
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == "GET":
+        return app.send_static_file('create.html')
+    else:
+        text = request.form.get("text")
+        key = _generate_key()
+        encrypted_text = _encrypt_text(key, text)
+        id = db.Note.create(text=encrypted_text).id
+        super_key = _encrypt_text(security_key, str(id) + "=" + key)
+        return render_template('code.html', code=super_key)
 
 
 @app.route('/api/add', methods=["POST"])
