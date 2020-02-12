@@ -27,7 +27,8 @@ Note.create_table()
 if __name__ == '__main__':
     import requests
 
-    key = requests.post("http://127.0.0.1:5000/api/add", json={"text": "hfdhahfdas"}).json().get("key")
+    URL = "https://fkn-project.herokuapp.com"
+    key = requests.post(URL + "/api/add", json={"text": "hfdhahfdas"}).json().get("key")
     print(key)
-    text = requests.post("http://127.0.0.1:5000/api/get", json={"key": key}).json().get("text")
+    text = requests.post(URL + "/api/get", json={"key": key}).json().get("text")
     print(text)

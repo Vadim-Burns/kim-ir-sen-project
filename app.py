@@ -9,7 +9,6 @@ from flask import request, abort
 app = Flask(__name__)
 # Must be 32 byte length
 security_key = os.environ.get("SECURITY_KEY")
-print(security_key)
 
 
 def _generate_key(length=32):
@@ -50,7 +49,7 @@ def _decrypt_text(key, text):
 
 @app.route('/')
 def hello_world():
-    return security_key
+    return "Web interface will be added later"
 
 
 @app.route('/api/add', methods=["POST"])
