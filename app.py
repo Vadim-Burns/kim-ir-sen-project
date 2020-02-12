@@ -48,8 +48,8 @@ def _decrypt_text(key, text):
 
 
 @app.route('/')
-def hello_world():
-    return "Web interface will be added later"
+def index():
+    return app.send_static_file('index.html')
 
 
 @app.route('/api/add', methods=["POST"])
