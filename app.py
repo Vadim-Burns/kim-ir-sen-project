@@ -81,6 +81,9 @@ def find():
     key = super_key_decrypted[index + 1:]
 
     encrypted_text = db.Note.get_text_by_id(id)
+    if encrypted_text is None:
+        return 404
+
     text = _decrypt_text(key, encrypted_text)
 
     return render_template("note.html", text=text)
