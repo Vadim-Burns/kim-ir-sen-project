@@ -6,7 +6,8 @@ import base64
 import db
 from flask import request, abort, render_template
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.join(os.getcwd() + "/static"))
+print(app.static_folder)
 # Must be 32 byte length
 security_key = os.environ.get("SECURITY_KEY")
 
