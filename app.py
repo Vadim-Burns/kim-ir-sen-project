@@ -83,7 +83,7 @@ def find():
     encrypted_text = db.Note.get_text_by_id(id)
     text = _decrypt_text(key, encrypted_text)
 
-    return render_template("note.html", note=text)
+    return render_template("note.html", text=text)
 
 
 @app.route('/api/add', methods=["POST"])
