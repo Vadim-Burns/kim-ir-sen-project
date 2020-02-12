@@ -58,11 +58,32 @@ def create():
         return app.send_static_file('create.html')
     else:
         text = request.form.get("text")
+        if text is None:
+            return 400
+
         key = _generate_key()
         encrypted_text = _encrypt_text(key, text)
         id = db.Note.create(text=encrypted_text).id
         super_key = _encrypt_text(security_key, str(id) + "=" + key)
         return render_template('code.html', code=super_key)
+
+
+@app.route("/find", methods=['POST'])
+def find():
+    super_key = request.form.get("key")
+    if super_key is None:
+        return 400
+
+    super_key_decrypted = _decrypt_text(security_key, super_key)
+
+    index = super_key_decrypted.find("=")
+    id = int(super_key_decrypted[:index])
+    key = super_key_decrypted[index + 1:]
+
+    encrypted_text = db.Note.get_text_by_id(id)
+    text = _decrypt_text(key, encrypted_text)
+
+    return render_template("note.html", note=text)
 
 
 @app.route('/api/add', methods=["POST"])
