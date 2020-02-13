@@ -7,7 +7,6 @@ import db
 from flask import request, abort, render_template
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd() + "/static"))
-print(app.static_folder)
 # Must be 32 byte length
 security_key = os.environ.get("SECURITY_KEY")
 
@@ -60,7 +59,7 @@ def create():
     else:
         text = request.form.get("text")
         if text is None:
-            return 400
+            return abort(400)
 
         key = _generate_key()
         encrypted_text = _encrypt_text(key, text)
@@ -83,7 +82,7 @@ def find():
 
     encrypted_text = db.Note.get_text_by_id(id)
     if encrypted_text is None:
-        return 404
+        return abort(404)
 
     text = _decrypt_text(key, encrypted_text)
 
