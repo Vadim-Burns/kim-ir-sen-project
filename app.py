@@ -1,50 +1,12 @@
 from flask import Flask
-from random import randint
 import os
-import pyaes
-import base64
 import db
 from flask import request, abort, render_template
+from cryptography.fernet import Fernet
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd() + "/static"))
-# Must be 32 byte length
 security_key = os.environ.get("SECURITY_KEY")
-
-
-def _generate_key(length=32):
-    """
-    This functions generates key.
-    :param `int` length:
-    :return `str` main_key:
-    """
-    alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!#$%&*+=-/\\"
-    main_key = ""
-    for _ in range(length):
-        main_key += alphabet[randint(0, len(alphabet) - 1)]
-    return main_key
-
-
-def _encrypt_text(key, text):
-    """
-    Key must be 32 byte length!!
-    :param `str` key:
-    :param `str` text:
-    :return `str`:
-    """
-    aes = pyaes.AESModeOfOperationCTR(key.encode())
-    ciphertext = aes.encrypt(text)
-    return base64.b64encode(ciphertext).decode()
-
-
-def _decrypt_text(key, text):
-    """
-    Key must be 32 byte length!!
-    :param `str` key:
-    :param `str` text:
-    :return `str`:
-    """
-    aes = pyaes.AESModeOfOperationCTR(key.encode())
-    return aes.decrypt(base64.b64decode(text.encode())).decode()
+main_fernet = Fernet(security_key.encode())
 
 
 @app.route('/')
@@ -61,10 +23,12 @@ def create():
         if text is None:
             return abort(400)
 
-        key = _generate_key()
-        encrypted_text = _encrypt_text(key, text)
-        id = db.Note.create(text=encrypted_text).id
-        super_key = _encrypt_text(security_key, str(id) + "=" + key)
+        key = Fernet.generate_key()
+        f = Fernet(key)
+        encrypted_text = f.encrypt(text.encode())
+        id = db.Note.create(text=encrypted_text.decode()).id
+
+        super_key = main_fernet.encrypt((str(id) + "=" + key.decode()).encode()).decode()
         return render_template('code.html', code=super_key)
 
 
@@ -74,7 +38,7 @@ def find():
     if super_key is None:
         return 400
 
-    super_key_decrypted = _decrypt_text(security_key, super_key)
+    super_key_decrypted = main_fernet.decrypt(super_key.encode()).decode()
 
     index = super_key_decrypted.find("=")
     id = int(super_key_decrypted[:index])
@@ -84,7 +48,8 @@ def find():
     if encrypted_text is None:
         return abort(404)
 
-    text = _decrypt_text(key, encrypted_text)
+    f = Fernet(key)
+    text = f.decrypt(encrypted_text.encode()).decode()
 
     return render_template("note.html", text=text)
 
@@ -99,11 +64,12 @@ def add():
     if json_data is None or json_data.get("text") is None:
         abort(400)
 
-    key = _generate_key()
-    encrypted_text = _encrypt_text(key, json_data.get("text"))
-    id = db.Note.create(text=encrypted_text).id
+    key = Fernet.generate_key()
+    f = Fernet(key)
+    encrypted_text = f.encrypt(json_data.get("text").encode())
+    id = db.Note.create(text=encrypted_text.decode()).id
 
-    super_key = _encrypt_text(security_key, str(id) + "=" + key)
+    super_key = main_fernet.encrypt((str(id) + "=" + key.decode()).encode()).decode()
     return {"key": super_key}
 
 
@@ -118,14 +84,18 @@ def get():
         abort(400)
 
     try:
-        super_key_decrypted = _decrypt_text(security_key, json_data.get("key"))
+        super_key_decrypted = main_fernet.decrypt(json_data.get("key").encode()).decode()
 
         index = super_key_decrypted.find("=")
         id = int(super_key_decrypted[:index])
         key = super_key_decrypted[index + 1:]
 
         encrypted_text = db.Note.get_text_by_id(id)
-        text = _decrypt_text(key, encrypted_text)
+        if encrypted_text is None:
+            return abort(404)
+
+        f = Fernet(key)
+        text = f.decrypt(encrypted_text.encode()).decode()
 
         return {"text": text}
     except:
