@@ -1,11 +1,11 @@
 FROM python:3.8-alpine
 
-COPY . .
 RUN \
 	apk add --no-cache postgresql-libs && \
 	apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev libffi-dev openssl-dev postgresql-dev && \
 	pip install --no-cache-dir -r requirements.txt && \
 	apk --purge del .build-deps
+COPY . .
 
 EXPOSE 80
 ENV SECURITY_KEY=cWXO0G3BdlKyvpupgQ-zDwcjIdqvjE54FdfXyoNSuYk\=
