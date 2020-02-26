@@ -3,7 +3,7 @@ import requests
 
 
 class TestAPI(unittest.TestCase):
-    URL = "https://fkn-project.herokuapp.com"
+    URL = "http://127.0.0.1:8080"
 
     def test_api_correct(self):
         text = "Encrypting some weird text"

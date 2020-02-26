@@ -2,7 +2,7 @@ from peewee import Model, TextField
 import os
 from playhouse.db_url import connect
 
-db = connect(os.environ.get('DATABASE_URL'))
+db = connect(os.getenv("DATABASE_URL"))
 
 
 class Note(Model):
