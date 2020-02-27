@@ -22,13 +22,12 @@ This project has API.
 3. Build kim image
     In root of download repository execute:
     ```
-    docker build -t kim .
+    docker build -t IMAGE_NAME .
     ```
-    (`kim` is a variable, hence you can change it)
 
 4. Run kim image
     ```
-    docker run -it --rm -p 80:80 
+    docker run -it --rm -p 80:80 IMAGE_NAME
     ```
 
 ## How Does It Work?
