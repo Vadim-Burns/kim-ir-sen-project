@@ -11,7 +11,7 @@ class TestAPI(unittest.TestCase):
         key = requests.post(self.URL + "/api/add", json={"text": text}).json().get("key")
 
         new_text = requests.post(self.URL + "/api/get", json={"key": key}).json().get("text")
-        self.assertEqual(new_text, text, "Начальный и разшифрованный тексты не совпадают")
+        self.assertEqual(new_text, text, "Start and final texts are not identical")
 
     def test_api_incorrect(self):
         code = requests.post(self.URL + "/api/add").status_code

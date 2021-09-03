@@ -2,6 +2,10 @@
 Kim Ir Sen project provides ability to create small encrypted notes.
 This project has API.
 
+## Overview
+
+![Kim ir sen project](https://i.imgur.com/pg5GC6v.gif)
+
 ## Getting Started
 1. Install [docker](https://docs.docker.com/install/) 
     If you use Debian/Ubuntu:
@@ -15,7 +19,7 @@ This project has API.
 
 2. Fill in variables
     1. Open Dockerfile
-    2. After SECURITY_KEY write your security key(this key is used to encrypt id of notes in db, after change all old keys will become unusable)
+    2. After SECURITY_KEY write your security key(this key is used to encrypt id of notes in db, after change SECURITY_KEY all old keys will become unusable)
     3. After DATABASE_URL write your database url (example: postgress://user:password@host:port/name_of_db)
     4. Save and exit
 
@@ -39,16 +43,22 @@ This project has API.
 
 ### Getting note
 1. User enters his resulting code
-2. Server decrypts by SECURITY_KEY this code and gets id of Note in database and user_key to decrypt note
+2. Server decrypts by SECURITY_KEY this code and gets id of note in database and user_key to decrypt note
 3. Server decrypts note by user_key and returns note to user
-4. After returning note to user server doesn't store note any more! It deletes note from database after that.
+4. After returning note to user server doesn't store note anymore! It deletes note from database after that.
 
-    | WARNING: If SECURITY_KEY changes or user_key is loss note there is no a chance to decrypt note! |
+    | WARNING: If SECURITY_KEY changes or user_key is loss there is no chance to decrypt note! |
 
 ## Running the tests
 It tests only API!
 1. Change URL in file api_tests.py to url of server storing your kim-ir-sen-project
 2. ```python3 api_tests.py```
+
+## Available database types
+1. [Postgresql](https://www.postgresql.org/)
+2. [MySQL](https://www.mysql.com/)
+3. [SQLite](https://www.sqlite.org/index.html)
+4. [CockroachDB](https://www.cockroachlabs.com/)
 
 ## REST API
 **Create Note**
@@ -132,7 +142,7 @@ Try something like [docker-compose deployment](https://testdriven.io/blog/docker
 * [Cryptography](https://cryptography.io/en/latest/) - library to encrypt/decrypt data
 
 ## Authors
-* **Vadim Tsindyakin** - [len2367](https://gist.github.com/len2367)
+* **Vadim Tsindyaykin** - [Vadim-Burns](https://github.com/Vadim-Burns)
 
 
 ## License
