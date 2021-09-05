@@ -3,7 +3,7 @@ This file contains flask server for processing requests
 """
 
 from flask import Flask
-from flask import request, abort, render_template
+from flask import request, abort, render_template, redirect
 
 import config
 import crypt
@@ -15,6 +15,11 @@ app = Flask(__name__, static_folder=config.static_folder)
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
+
+
+@app.errorhandler(404)
+def error_404(error):
+    return redirect("/")
 
 
 # TODO: написать описание почему два метода доступно и чем они различаются
@@ -45,6 +50,7 @@ def create():
         )
 
 
+# TODO: переделать под GET и добавление ключа в путь?
 @app.route("/find", methods=['POST'])
 def find():
     super_key = request.form.get("key")
