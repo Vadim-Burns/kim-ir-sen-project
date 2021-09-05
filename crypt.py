@@ -10,26 +10,24 @@ security_key = config.security_key
 main_fernet = Fernet(security_key.encode())
 
 
-def generate_key() -> bytes:
-    return Fernet.generate_key()
+def generate_key() -> str:
+    return Fernet.generate_key().decode()
 
 
-def encrypt_text(text: str, key: bytes) -> str:
-    return Fernet(key).encrypt(
+def encrypt_text(text: str, key: str) -> str:
+    return Fernet(key.encode()).encrypt(
         text.encode()
     ).decode()
 
 
-def encrypt_key(id: int, key: bytes) -> str:
+def encrypt_key(id: int, key: str) -> str:
     return main_fernet.encrypt(
         (
-                str(id) + ";" + key.decode()
+                str(id) + ";" + key
         ).encode()
     ).decode()
 
 
-# TODO: Ошибка ввода латиницы
-# TODO: Ошибка при вводе пустого кода
 def decrypt_key(key: str) -> (int, str):
     key_decrypted = main_fernet.decrypt(
         key.encode()

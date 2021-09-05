@@ -27,12 +27,12 @@ def error_404(error):
 def create():
     if request.method == "GET":
         return app.send_static_file('create.html')
-    else:
+    elif request.method == "POST":
         text = request.form.get("text")
 
         key = crypt.generate_key()
 
-        id = db.Note.create(
+        note_id = db.Note.create(
             text=crypt.encrypt_text(
                 text,
                 key
@@ -42,18 +42,17 @@ def create():
         return render_template(
             'code.html',
             code=crypt.encrypt_key(
-                id,
+                note_id,
                 key
             )
         )
 
 
-# TODO: переделать под GET и добавление ключа в путь?
 @app.route("/find", methods=['POST'])
 def find():
     super_key = request.form.get("key")
-    if super_key is None:
-        return 400
+    if super_key is None or super_key.strip() == "" or not super_key.isascii():
+        return redirect("/")
 
     note_id, key = crypt.decrypt_key(super_key)
 
@@ -83,7 +82,10 @@ def add():
     reason - json data is not valid
 
     """
-    json_data = request.get_json()
+    json_data = request.get_json(
+        force=True,
+        silent=True
+    )
     if json_data is None or json_data.get("text") is None:
         return {
                    "error": "json data is not valid"
@@ -91,7 +93,7 @@ def add():
 
     key = crypt.generate_key()
 
-    id = db.Note.create(
+    note_id = db.Note.create(
         text=crypt.encrypt_text(
             json_data.get("text"),
             key
@@ -100,7 +102,7 @@ def add():
 
     return {
         "key": crypt.encrypt_key(
-            id,
+            note_id,
             key
         )
     }
@@ -124,14 +126,20 @@ def get():
     reason - note not found
 
     """
-    json_data = request.get_json()
-    if json_data is None or json_data.get("key") is None:
+    json_data = request.get_json(
+        force=True,
+        silent=True
+    )
+    if json_data is None or json_data.get("key") is None or \
+            json_data.get("key").strip() == "" or not json_data.get("key").isascii():
         return {
                    "error": "json data is not valid"
                }, 400
 
     # TODO: проверить на возможные ошибки
-    note_id, key = crypt.decrypt_key(json_data.get("key"))
+    note_id, key = crypt.decrypt_key(
+        json_data.get("key")
+    )
 
     encrypted_text = db.Note.get_text_by_id(note_id)
     if encrypted_text is None:
