@@ -3,7 +3,7 @@ This file contains flask server for processing requests
 """
 
 from flask import Flask
-from flask import request, abort, render_template, redirect
+from flask import request, render_template, redirect
 
 import config
 import crypt
@@ -29,8 +29,6 @@ def create():
         return app.send_static_file('create.html')
     else:
         text = request.form.get("text")
-        if text is None:
-            return abort(400)
 
         key = crypt.generate_key()
 
@@ -60,9 +58,6 @@ def find():
     note_id, key = crypt.decrypt_key(super_key)
 
     encrypted_text = db.Note.get_text_by_id(note_id)
-    # TODO: поправить проверку
-    if encrypted_text is None:
-        return abort(404)
 
     return render_template(
         "note.html",
@@ -90,8 +85,9 @@ def add():
     """
     json_data = request.get_json()
     if json_data is None or json_data.get("text") is None:
-        # TODO: удалить abort
-        abort(400)
+        return {
+                   "error": "json data is not valid"
+               }, 400
 
     key = crypt.generate_key()
 
@@ -127,29 +123,28 @@ def get():
     code - 404
     reason - note not found
 
-    code - 404
-    reason - wrong key
     """
     json_data = request.get_json()
     if json_data is None or json_data.get("key") is None:
-        abort(400)
-
-    try:
-
-        note_id, key = crypt.decrypt_key(json_data.get("key"))
-
-        encrypted_text = db.Note.get_text_by_id(note_id)
-        if encrypted_text is None:
-            return abort(404)
-
         return {
-            "text": crypt.decrypt_text(
-                encrypted_text,
-                key
-            )
-        }
-    except:
-        return {"error": "Wrong key"}, 404
+                   "error": "json data is not valid"
+               }, 400
+
+    # TODO: проверить на возможные ошибки
+    note_id, key = crypt.decrypt_key(json_data.get("key"))
+
+    encrypted_text = db.Note.get_text_by_id(note_id)
+    if encrypted_text is None:
+        return {
+                   "error": "note not found"
+               }, 404
+
+    return {
+        "text": crypt.decrypt_text(
+            encrypted_text,
+            key
+        )
+    }
 
 
 if __name__ == '__main__':

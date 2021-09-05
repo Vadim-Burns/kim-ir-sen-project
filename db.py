@@ -19,6 +19,7 @@ class BadeModel(Model):
 class Note(BadeModel):
     text = TextField()
 
+    # TODO: проверить на случай если записки в бд нет
     @staticmethod
     def get_text_by_id(id: int) -> str:
         """

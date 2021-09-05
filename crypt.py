@@ -29,6 +29,7 @@ def encrypt_key(id: int, key: bytes) -> str:
 
 
 # TODO: Ошибка ввода латиницы
+# TODO: Ошибка при вводе пустого кода
 def decrypt_key(key: str) -> (int, str):
     key_decrypted = main_fernet.decrypt(
         key.encode()
