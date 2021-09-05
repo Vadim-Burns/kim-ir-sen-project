@@ -1,14 +1,20 @@
-from flask import Flask
-import os
-import db
-from flask import request, abort, render_template
-from cryptography.fernet import Fernet
+"""
+This file contains flask server for processing requests
+"""
 
-app = Flask(__name__, static_folder=os.path.join(os.getcwd() + "/static"))
-security_key = os.environ.get("SECURITY_KEY")
+from cryptography.fernet import Fernet
+from flask import Flask
+from flask import request, abort, render_template
+
+import config
+import db
+
+app = Flask(__name__, static_folder=config.static_folder)
+security_key = config.security_key
 main_fernet = Fernet(security_key.encode())
 
 
+# TODO: вынести питон код или докер инфу в отдельную папку, разнести код по файлам
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
@@ -38,6 +44,7 @@ def find():
     if super_key is None:
         return 400
 
+    # TODO: Ошибка ввода латиницы
     super_key_decrypted = main_fernet.decrypt(super_key.encode()).decode()
 
     index = super_key_decrypted.find("=")
@@ -102,5 +109,6 @@ def get():
         return {"error": "Wrong key"}, 404
 
 
+# TODO: подумать над другим способом запуска и включить прод версию
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

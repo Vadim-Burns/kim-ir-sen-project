@@ -3,3 +3,4 @@ gunicorn==20.0.4
 cryptography==2.8
 peewee==3.13.1
 psycopg2==2.8.4
+requests==2.26.0
