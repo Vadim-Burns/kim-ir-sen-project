@@ -30,6 +30,9 @@ def encrypt_key(id: int, key: str) -> str:
 
 
 def decrypt_key(key: str) -> (int, str):
+    """
+    Returns None, None if key is invalid
+    """
     try:
         key_decrypted = main_fernet.decrypt(
             key.encode()

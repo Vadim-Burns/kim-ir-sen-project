@@ -68,7 +68,7 @@ def find():
     if encrypted_text is None:
         return render_template(
             "error.html",
-            error="Your note doesn't exists anymore"
+            error="Note not found"
         )
 
     else:
