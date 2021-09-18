@@ -1,30 +1,39 @@
 # Kim Ir Sen Project
-Kim Ir Sen project provides ability to create small encrypted notes.
-This project has API.
+
+Kim Ir Sen project provides ability to create small encrypted notes. This project has API.
 
 ## Overview
 
 ![Kim ir sen project](https://i.imgur.com/pg5GC6v.gif)
 
+## Environment variables
+
+1. ``DATABASE_URL`` - url for connecting to database(example: ``postgress://user:password@host:port/name_of_db``)
+2. ``SECURITY_KEY`` - your main key for encrypting all note keys(
+   example: ``ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=``)
+
 ## Getting Started
-1. Install [docker](https://docs.docker.com/install/) 
-    If you use Debian/Ubuntu:
+
+### Docker
+
+1. Install [docker](https://docs.docker.com/install/)
+   If you use Debian/Ubuntu:
     ```
     sudo apt update && sudo apt install docker
     ```
-    If you use Arch(btw I use Arch):
+   If you use Arch(btw I use Arch):
     ```
     sudo pacman -Syy docker
     ```
 
 2. Fill in variables
     1. Open Dockerfile
-    2. After SECURITY_KEY write your security key(this key is used to encrypt id of notes in db, after change SECURITY_KEY all old keys will become unusable)
-    3. After DATABASE_URL write your database url (example: postgress://user:password@host:port/name_of_db)
+    2. After SECURITY_KEY write your security key(this key is used to encrypt id of notes in db, after change
+       SECURITY_KEY all old keys will become unusable)
+    3. After DATABASE_URL write your database url
     4. Save and exit
 
-3. Build kim image
-    In root of download repository execute:
+3. Build kim image In root of download repository execute:
     ```
     docker build -t IMAGE_NAME .
     ```
@@ -34,14 +43,35 @@ This project has API.
     docker run -it --rm -p 8080:8080 IMAGE_NAME
     ```
 
+### Pure flask
+
+**Use only for development!**
+
+1. Go to `app` folder inside project. (There is `app.py` file)
+2. Using virtualenv ([How to install](https://virtualenv.pypa.io/en/latest/installation.html)) create venv for python
+   dependencies ``virtualenv venv``
+3. Activate it ``source venv/bin/activate``
+4. Install requirements ``pip install -r requirements.txt``
+5. Generate security key if u don't have
+    1. Start python console by typing ``python``
+    2. Import cryptography library to generate key ``from cryptography.fernet import Fernet``
+    3. Generate security key ``Fernet.generate_key().decode()``
+6. Set environment variables
+    1. ``export DATABASE_URL=postgress://user:password@host:port/name_of_db``
+    2. ``export SECURITY_KEY=your_key``
+7. Start the app ``python app.py``
+
 ## How Does It Work?
+
 ### Creating note
+
 1. User enters his note
 2. Server generates random user_key to encrypt note
 3. Server encrypts note with user_key and save ONLY ENCRYPTED note in database
 4. Server encrypts user_key and id, of encrypted note in database, and then returns the resulting code to user
 
 ### Getting note
+
 1. User enters his resulting code
 2. Server decrypts by SECURITY_KEY this code and gets id of note in database and user_key to decrypt note
 3. Server decrypts note by user_key and returns note to user
@@ -51,8 +81,11 @@ This project has API.
 
 ## Running the tests
 It tests only API!
-1. Change URL in file api_tests.py to url of server storing your kim-ir-sen-project
-2. ```python3 api_tests.py```
+
+1. Start the app
+2. Change URL in file api_tests.py to url of server storing your kim-ir-sen-project, by default url
+   is ``http://127.0.0.1:8080``
+3. ```python3 app/tests/api_tests.py```
 
 ## Available database types
 1. [Postgresql](https://www.postgresql.org/)
@@ -69,25 +102,28 @@ Returns json with key to get note
 
   /api/add
 
-* **Method:**
+* **Method**
 
   `POST`
-  
+
+* **Data type**
+
+  `json`
 
 * **Data Params**
 
   text=[string]
-  
- 
-* **Success Response:**
 
-  * **Code:** 200 <br />
-    **Content:** `{"key": "12fdjsakjfljald...."}`
- 
-* **Error Response:**
 
-  * **Code:** 400 Bad Request <br />
-    Your json doesn't store field `text`
+* **Success Response**
+
+    * **Code:** 200 <br />
+      **Content:** `{"key": "12fdjsakjfljald...."}`
+
+* **Error Response**
+
+    * **Code:** 400 Bad Request <br />
+    * **Content:** `{"error": "json data is not valid"}`
 
 * **Sample Call:**
 
@@ -104,10 +140,14 @@ Returns json with decrypted note
 
   /api/get
 
-* **Method:**
+* **Method**
 
   `POST`
-  
+
+* **Data type**
+
+  `json`
+
 
 * **Data Params**
 
@@ -121,10 +161,12 @@ Returns json with decrypted note
  
 * **Error Response:**
 
-  * **Code:** 400 Bad Request <br />
-    Your json doesn't store field `key` 
-  * **Code:** 404 Bad Request <br />
-    Note not found in database or Wrong Key(if it is Wrong Key, response is {"error": "Wrong key"})
+    * **Code:** 400 Bad Request <br />
+      **Content:** `{"error": "json data is not valid"}`
+    * **Code:** 400 Bad Request <br />
+      **Content:** `{"error": "invalid key"}`
+    * **Code:** 404 Bad Request <br />
+      **Content:** `{"error": "note not found"}`
 
 * **Sample Call:**
 

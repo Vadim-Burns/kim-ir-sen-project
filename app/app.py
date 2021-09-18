@@ -165,7 +165,7 @@ def get():
 
     if note_id is None:
         return {
-                   "error": "invalid key",
+                   "error": "invalid key"
                }, 400
 
     encrypted_text = db.Note.get_text_by_id(note_id)
