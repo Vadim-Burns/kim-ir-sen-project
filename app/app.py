@@ -11,6 +11,7 @@ import db
 
 app = Flask(__name__, static_folder=config.static_folder)
 
+print(config.static_folder)
 
 @app.route('/')
 def index():
@@ -184,4 +185,4 @@ def get():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='127.0.0.1', port=8080)
