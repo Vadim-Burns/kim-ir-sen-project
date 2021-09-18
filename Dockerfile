@@ -12,7 +12,6 @@ RUN \
 	pip install --no-cache-dir -r requirements.txt && \
 	apk --purge del .build-deps
 
-
 EXPOSE 8080
 
 # Prevents Python from writing pyc files to disc (equivalent to python -B option)
@@ -24,8 +23,8 @@ ENV PYTHONUNBUFFERED 1
 # key has to be 32 bit length (you can generate it by cryptography.Fernet.generate_key())
 ENV SECURITY_KEY key
 
-ENV DATABASE_URL database_url
+ENV DATABASE_URL postgress://user:password@host:port/name_of_db
 
 ENV FLASK_ENV production
 
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "--log-file=-", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "--log-file=-", "--log-level", "debug", "app:app"]
