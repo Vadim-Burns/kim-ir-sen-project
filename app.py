@@ -56,12 +56,18 @@ def find():
 
     note_id, key = crypt.decrypt_key(super_key)
 
+    if note_id is None:
+        return render_template(
+            "error.html",
+            error="Invalid key"
+        )
+
     encrypted_text = db.Note.get_text_by_id(note_id)
 
     if encrypted_text is None:
         return render_template(
-            "note.html",
-            text="Your note doesn't exists anymore"
+            "error.html",
+            error="Your note doesn't exists anymore"
         )
 
     else:
@@ -79,6 +85,9 @@ def add():
     """
     This function checks if json_data is valid, then generate random key and save
     encrypted text to database. Then generates access code for user note.id + "=" + key for text.
+
+    Example correct request:
+    {"text": "Hello there!"}
 
     Example correct answer:
     {"key": "gAAAAABhNQGGRwrwHkwydWFZfnt0N4gq"}
@@ -121,13 +130,19 @@ def get():
     This function checks if json_data is valid, then decrypt user access code and get id of Note.
     After that it decrypts text from note and sends back to user.
 
+    Example correct request:
+    {"key": "gAAAAABhNQGGRwrwHkwydWFZfnt0N4gq"}
+
     Example correct answer:
-    {"text": "hello there"}
+    {"text": "Hello there!"}
 
     Error answers:
 
     code - 400
     reason - json data is not valid
+
+    code - 400
+    reason - invalid key
 
     code - 404
     reason - note not found
@@ -143,10 +158,14 @@ def get():
                    "error": "json data is not valid"
                }, 400
 
-    # TODO: проверить на возможные ошибки
     note_id, key = crypt.decrypt_key(
         json_data.get("key")
     )
+
+    if note_id is None:
+        return {
+                   "error": "invalid key",
+               }, 400
 
     encrypted_text = db.Note.get_text_by_id(note_id)
 
@@ -163,5 +182,6 @@ def get():
     }
 
 
+# TODO: включить прод версию
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

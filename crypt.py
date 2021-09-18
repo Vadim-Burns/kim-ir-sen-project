@@ -3,6 +3,7 @@ This file contains all cryptography operations and fucntions
 """
 
 from cryptography.fernet import Fernet
+from cryptography.fernet import InvalidToken
 
 import config
 
@@ -29,13 +30,17 @@ def encrypt_key(id: int, key: str) -> str:
 
 
 def decrypt_key(key: str) -> (int, str):
-    key_decrypted = main_fernet.decrypt(
-        key.encode()
-    ).decode()
+    try:
+        key_decrypted = main_fernet.decrypt(
+            key.encode()
+        ).decode()
 
-    key_info = key_decrypted.split(';')
+        key_info = key_decrypted.split(';')
 
-    return int(key_info[0]), key_info[1]
+        return int(key_info[0]), key_info[1]
+
+    except InvalidToken:
+        return None, None
 
 
 def decrypt_text(encrypted_text: str, key: str) -> str:
