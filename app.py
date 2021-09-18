@@ -58,13 +58,20 @@ def find():
 
     encrypted_text = db.Note.get_text_by_id(note_id)
 
-    return render_template(
-        "note.html",
-        text=crypt.decrypt_text(
-            encrypted_text,
-            key
+    if encrypted_text is None:
+        return render_template(
+            "note.html",
+            text="Your note doesn't exists anymore"
         )
-    )
+
+    else:
+        return render_template(
+            "note.html",
+            text=crypt.decrypt_text(
+                encrypted_text,
+                key
+            )
+        )
 
 
 @app.route('/api/add', methods=["POST"])
@@ -142,6 +149,7 @@ def get():
     )
 
     encrypted_text = db.Note.get_text_by_id(note_id)
+
     if encrypted_text is None:
         return {
                    "error": "note not found"
