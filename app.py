@@ -22,30 +22,31 @@ def error_404(error):
     return redirect("/")
 
 
-# TODO: написать описание почему два метода доступно и чем они различаются
-@app.route('/create', methods=['GET', 'POST'])
-def create():
-    if request.method == "GET":
-        return app.send_static_file('create.html')
-    elif request.method == "POST":
-        text = request.form.get("text")
+@app.route('/create.html', methods=['GET'])
+def create_html():
+    return app.send_static_file('create.html')
 
-        key = crypt.generate_key()
 
-        note_id = db.Note.create(
-            text=crypt.encrypt_text(
-                text,
-                key
-            )
-        ).id
+@app.route('/create', methods=['POST'])
+def create_note():
+    text = request.form.get("text")
 
-        return render_template(
-            'code.html',
-            code=crypt.encrypt_key(
-                note_id,
-                key
-            )
+    key = crypt.generate_key()
+
+    note_id = db.Note.create(
+        text=crypt.encrypt_text(
+            text,
+            key
         )
+    ).id
+
+    return render_template(
+        'code.html',
+        code=crypt.encrypt_key(
+            note_id,
+            key
+        )
+    )
 
 
 @app.route("/find", methods=['POST'])
