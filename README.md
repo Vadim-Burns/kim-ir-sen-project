@@ -9,8 +9,7 @@ Kim Ir Sen project provides ability to create small encrypted notes. This projec
 ## Environment variables
 
 1. ``DATABASE_URL`` - url for connecting to database(example: ``postgress://user:password@host:port/name_of_db``)
-2. ``SECURITY_KEY`` - your main key for encrypting all note keys(
-   example: ``ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=``)
+2. ``SECURITY_KEY`` - your main key for encrypting all note keys(example: ``ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=``)
 
 ## Getting Started
 
