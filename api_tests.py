@@ -1,10 +1,17 @@
+"""
+This file contains api tests
+
+Instruction:
+1. Start app.py on port 8080
+2. Start this fil
+3. Check out results
+"""
 import unittest
 
 import requests
 
 
 class TestAPI(unittest.TestCase):
-    # TODO: автозапуск приложения при запуске тестов
     URL = "http://127.0.0.1:8080"
 
     """
