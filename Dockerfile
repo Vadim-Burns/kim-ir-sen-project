@@ -1,17 +1,18 @@
 FROM python:3.8-alpine
 
+# copy project
+COPY app app
+
+WORKDIR app
+
 # install python dependencies
-COPY requirements.txt .
 RUN \
 	apk add --no-cache postgresql-libs && \
 	apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev libffi-dev openssl-dev postgresql-dev && \
 	pip install --no-cache-dir -r requirements.txt && \
 	apk --purge del .build-deps
 
-# copy project
-COPY . .
-
-EXPOSE 80
+EXPOSE 8080
 
 # Prevents Python from writing pyc files to disc (equivalent to python -B option)
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,8 +23,8 @@ ENV PYTHONUNBUFFERED 1
 # key has to be 32 bit length (you can generate it by cryptography.Fernet.generate_key())
 ENV SECURITY_KEY key
 
-ENV DATABASE_URL url
+ENV DATABASE_URL postgress://user:password@host:port/name_of_db
 
 ENV FLASK_ENV production
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "--log-file=-", "--log-level", "debug", "app:app"]

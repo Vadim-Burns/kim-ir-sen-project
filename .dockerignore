@@ -1,7 +1,5 @@
 venv
-api_tests.py
-runtime.txt
-Procfile
+/app/tests
 .git
 Dockerfile
 .gitignore
