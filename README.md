@@ -31,7 +31,7 @@ This project has API.
 
 4. Run kim image
     ```
-    docker run -it --rm -p 80:80 IMAGE_NAME
+    docker run -it --rm -p 8080:8080 IMAGE_NAME
     ```
 
 ## How Does It Work?

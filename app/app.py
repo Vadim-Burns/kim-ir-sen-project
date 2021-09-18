@@ -11,7 +11,6 @@ import db
 
 app = Flask(__name__, static_folder=config.static_folder)
 
-print(config.static_folder)
 
 @app.route('/')
 def index():
