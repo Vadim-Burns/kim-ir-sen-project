@@ -2,7 +2,7 @@
 This file contains api tests
 
 Instruction:
-1. Start app.py on port 8080
+1. Start server.py on port 8080
 2. Start this fil
 3. Check out results
 """

@@ -7,7 +7,7 @@ from cryptography.fernet import InvalidToken
 
 import config
 
-security_key = config.security_key
+security_key = config.SECURITY_KEY
 main_fernet = Fernet(security_key.encode())
 
 

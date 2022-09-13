@@ -7,7 +7,7 @@ from playhouse.db_url import connect
 
 import config
 
-db = connect(config.database_url)
+db = connect(config.DATABASE_CONNECT_URL)
 
 
 class BadeModel(Model):
