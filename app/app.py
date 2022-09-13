@@ -184,4 +184,5 @@ def get():
 
 
 if __name__ == '__main__':
+    # TODO: настройки порта
     app.run(host='127.0.0.1', port=8080)
