@@ -1,6 +1,5 @@
 import config
 from di import DI
-from server import app as flask_app
 
 if __name__ == '__main__':
     # logging.basicConfig(
@@ -10,4 +9,6 @@ if __name__ == '__main__':
     # )
 
     DI()
+
+    from server import app as flask_app
     flask_app.run(host=config.FLASK_ADDR, port=config.FLASK_PORT)

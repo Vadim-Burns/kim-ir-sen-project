@@ -6,10 +6,12 @@ from flask import Flask
 from flask import request, render_template, redirect
 
 import config
-import crypt
 import db
+import inject
+from services import AbstractCryptService
 
 app = Flask(__name__, static_folder=config.static_folder)
+crypt_service = inject.get_injector().get_instance(AbstractCryptService)
 
 
 @app.route('/')
@@ -31,10 +33,10 @@ def create_html():
 def create_note():
     text = request.form.get("text")
 
-    key = crypt.generate_key()
+    key = crypt_service.generate_key()
 
     note_id = db.Note.create(
-        text=crypt.encrypt_text(
+        text=crypt_service.encrypt_text(
             text,
             key
         )
@@ -42,7 +44,7 @@ def create_note():
 
     return render_template(
         'code.html',
-        code=crypt.encrypt_key(
+        code=crypt_service.encrypt_key(
             note_id,
             key
         )
@@ -55,7 +57,7 @@ def find():
     if super_key is None or super_key.strip() == "" or not super_key.isascii():
         return redirect("/")
 
-    note_id, key = crypt.decrypt_key(super_key)
+    note_id, key = crypt_service.decrypt_key(super_key)
 
     if note_id is None:
         return render_template(
@@ -74,7 +76,7 @@ def find():
     else:
         return render_template(
             "note.html",
-            text=crypt.decrypt_text(
+            text=crypt_service.decrypt_text(
                 encrypted_text,
                 key
             )
@@ -85,7 +87,7 @@ def find():
 def add():
     """
     This function checks if json_data is valid, then generate random key and save
-    encrypted text to database. Then generates access code for user note.id + "=" + key for text.
+    encrypt_serviceed text to database. Then generates access code for user note.id + "=" + key for text.
 
     Example correct request:
     {"text": "Hello there!"}
@@ -108,17 +110,17 @@ def add():
                    "error": "json data is not valid"
                }, 400
 
-    key = crypt.generate_key()
+    key = crypt_service.generate_key()
 
     note_id = db.Note.create(
-        text=crypt.encrypt_text(
+        text=crypt_service.encrypt_text(
             json_data.get("text"),
             key
         )
     ).id
 
     return {
-        "key": crypt.encrypt_key(
+        "key": crypt_service.encrypt_key(
             note_id,
             key
         )
@@ -128,8 +130,8 @@ def add():
 @app.route('/api/get', methods=["POST"])
 def get():
     """
-    This function checks if json_data is valid, then decrypt user access code and get id of Note.
-    After that it decrypts text from note and sends back to user.
+    This function checks if json_data is valid, then decrypt_service user access code and get id of Note.
+    After that it decrypt_services text from note and sends back to user.
 
     Example correct request:
     {"key": "gAAAAABhNQGGRwrwHkwydWFZfnt0N4gq"}
@@ -159,7 +161,7 @@ def get():
                    "error": "json data is not valid"
                }, 400
 
-    note_id, key = crypt.decrypt_key(
+    note_id, key = crypt_service.decrypt_key(
         json_data.get("key")
     )
 
@@ -176,7 +178,7 @@ def get():
                }, 404
 
     return {
-        "text": crypt.decrypt_text(
+        "text": crypt_service.decrypt_text(
             encrypted_text,
             key
         )
