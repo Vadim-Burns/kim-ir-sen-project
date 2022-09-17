@@ -6,12 +6,11 @@ from flask import Flask
 from flask import request, render_template, redirect
 
 import config
-import db
 import inject
-from services import AbstractCryptService
+from services import AbstractKimService
 
 app = Flask(__name__, static_folder=config.static_folder)
-crypt_service = inject.get_injector().get_instance(AbstractCryptService)
+kim_service = inject.get_injector().get_instance(AbstractKimService)
 
 
 @app.route('/')
@@ -32,22 +31,9 @@ def create_html():
 @app.route('/create', methods=['POST'])
 def create_note():
     text = request.form.get("text")
-
-    key = crypt_service.generate_key()
-
-    note_id = db.Note.create(
-        text=crypt_service.encrypt_text(
-            text,
-            key
-        )
-    ).id
-
     return render_template(
         'code.html',
-        code=crypt_service.encrypt_key(
-            note_id,
-            key
-        )
+        code=kim_service.save_note(text)
     )
 
 
@@ -57,30 +43,17 @@ def find():
     if super_key is None or super_key.strip() == "" or not super_key.isascii():
         return redirect("/")
 
-    note_id, key = crypt_service.decrypt_key(super_key)
-
-    if note_id is None:
+    note = kim_service.get_note(super_key)
+    if note is None:
         return render_template(
             "error.html",
             error="Invalid key"
         )
 
-    encrypted_text = db.Note.get_text_by_id(note_id)
-
-    if encrypted_text is None:
-        return render_template(
-            "error.html",
-            error="Note not found"
-        )
-
-    else:
-        return render_template(
-            "note.html",
-            text=crypt_service.decrypt_text(
-                encrypted_text,
-                key
-            )
-        )
+    return render_template(
+        "note.html",
+        text=kim_service.get_note(super_key)
+    )
 
 
 @app.route('/api/add', methods=["POST"])
@@ -110,20 +83,8 @@ def add():
                    "error": "json data is not valid"
                }, 400
 
-    key = crypt_service.generate_key()
-
-    note_id = db.Note.create(
-        text=crypt_service.encrypt_text(
-            json_data.get("text"),
-            key
-        )
-    ).id
-
     return {
-        "key": crypt_service.encrypt_key(
-            note_id,
-            key
-        )
+        "key": kim_service.save_note(json_data.get("text"))
     }
 
 
@@ -144,11 +105,8 @@ def get():
     code - 400
     reason - json data is not valid
 
-    code - 400
-    reason - invalid key
-
-    code - 404
-    reason - note not found
+    code - 403
+    reason - Invalid key
 
     """
     json_data = request.get_json(
@@ -161,25 +119,12 @@ def get():
                    "error": "json data is not valid"
                }, 400
 
-    note_id, key = crypt_service.decrypt_key(
-        json_data.get("key")
-    )
-
-    if note_id is None:
+    note = kim_service.get_note(json_data.get("key"))
+    if note is None:
         return {
-                   "error": "invalid key"
-               }, 400
-
-    encrypted_text = db.Note.get_text_by_id(note_id)
-
-    if encrypted_text is None:
-        return {
-                   "error": "note not found"
-               }, 404
+            "error": "Invalid key"
+        }, 403
 
     return {
-        "text": crypt_service.decrypt_text(
-            encrypted_text,
-            key
-        )
+        "text": note
     }

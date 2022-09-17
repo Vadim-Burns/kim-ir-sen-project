@@ -134,13 +134,13 @@ class TestAPI(unittest.TestCase):
 
         self.assertEqual(
             answer.status_code,
-            400,
+            403,
             "Wrong status code after sending post request to /api/add with wrong key"
         )
 
         self.assertEqual(
             answer.json()["error"],
-            "invalid key",
+            "Invalid key",
             "Wrong error after sending post request to /api/add with wrong key"
         )
 
@@ -158,12 +158,12 @@ class TestAPI(unittest.TestCase):
 
         self.assertEqual(
             answer.status_code,
-            404,
+            403,
             "Wrong status code after sending deleted note's key to /api/get"
         )
 
         self.assertEqual(
             answer.json()["error"],
-            "note not found",
+            "Invalid key",
             "Wrong error after sending deleted note's key to /api/get"
         )
