@@ -21,3 +21,4 @@ SECURITY_KEY = os.environ.get("SECURITY_KEY")
 
 # Flask static folder path(do not change this please)
 FLASK_STATIC_FOLDER = os.path.join(os.getcwd() + "/endpoints/web/static")
+FLASK_TEMPLATE_FOLDER = os.path.join(os.getcwd() + "/endpoints/web/templates")
