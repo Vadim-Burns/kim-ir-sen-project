@@ -19,5 +19,5 @@ DATABASE_CONNECT_URL = f"postgresql://{_POSTGRES_USER}:{_POSTGRES_PASSWORD}@{_PO
 # Security key
 SECURITY_KEY = os.environ.get("SECURITY_KEY")
 
-# Static folder path(do not change this please)
-static_folder = os.path.join(os.getcwd() + "/static")
+# Flask static folder path(do not change this please)
+FLASK_STATIC_FOLDER = os.path.join(os.getcwd() + "/endpoints/web/static")
