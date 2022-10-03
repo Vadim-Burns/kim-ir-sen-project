@@ -105,8 +105,15 @@ class TelegramEndpoint(AbstractEndpoint):
         self._delete_message(message)
 
         key = message.text.replace('/decrypt', '', 1)
-        dm = self._bot.send_message(
-            message.chat.id,
-            f"Your message is:\n`{self._kim_service.get_note(key)}`"
-        )
+        note = self._kim_service.get_note(key)
+        if note is None:
+            dm = self._bot.send_message(
+                message.chat.id,
+                "Wrong key"
+            )
+        else:
+            dm = self._bot.send_message(
+                message.chat.id,
+                f"Your message is:\n`{self._kim_service.get_note(key)}`"
+            )
         self._delete_message(dm, self._delete_time)
