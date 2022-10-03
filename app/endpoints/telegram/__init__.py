@@ -1,9 +1,10 @@
 import telebot
 
-import config
 from endpoints import AbstractEndpoint
 import inject
 from services import AbstractKimService
+from threading import Thread
+import time
 
 
 class TelegramEndpoint(AbstractEndpoint):
@@ -12,6 +13,7 @@ class TelegramEndpoint(AbstractEndpoint):
     def __init__(self, token: str, kim_service: AbstractKimService):
         self._bot = telebot.TeleBot(token, parse_mode='Markdown', threaded=False)
         self._kim_service = kim_service
+        self._delete_time = 30
 
         self._init_mapping()
 
@@ -53,25 +55,33 @@ class TelegramEndpoint(AbstractEndpoint):
     def get_name(self) -> str:
         return "Telegram bot"
 
-    def _delete_message(self, message):
-        self._bot.delete_message(chat_id=message.chat.id, message_id=message.id)
+    def _delete_message(self, message, timeout=None):
+        if timeout is None:
+            self._bot.delete_message(chat_id=message.chat.id, message_id=message.id)
+        else:
+            def foo():
+                time.sleep(timeout)
+                self._bot.delete_message(chat_id=message.chat.id, message_id=message.id)
+
+            Thread(target=foo).start()
 
     def start(self, message):
         self._delete_message(message)
 
-        self._bot.send_message(
+        dm = self._bot.send_message(
             message.chat.id,
             "Welcome to Kim Ir Sen Bot!\n" +
             "Here you can save encrypt messages\n" +
-            "Your confident is very important to our team, so every bot's message deletes after 10 seconds and your " +
+            f"Your confident is very important to our team, so every bot's message deletes after {self._delete_time} seconds and your " +
             "messages delete immediately\n" +
             "To get help message use /help"
         )
+        self._delete_message(dm, self._delete_time)
 
     def help(self, message):
         self._delete_message(message)
 
-        self._bot.send_message(
+        dm = self._bot.send_message(
             message.chat.id,
             "/encrypt - encrypt message\n" +
             "Example: /encrypt hello there!\n" +
@@ -79,21 +89,24 @@ class TelegramEndpoint(AbstractEndpoint):
             "Example: /decrypt key\n" +
             "/help - get this message"
         )
+        self._delete_message(dm, self._delete_time)
 
     def encrypt(self, message):
         self._delete_message(message)
 
         text = message.text.replace('/encrypt', '', 1)
-        self._bot.send_message(
+        dm = self._bot.send_message(
             message.chat.id,
-            f"Your key is `{self._kim_service.save_note(text)}` will be deleted in 10 seconds"
+            f"Your key is `{self._kim_service.save_note(text)}` will be deleted in {self._delete_time} seconds"
         )
+        self._delete_message(dm, self._delete_time)
 
     def decrypt(self, message):
         self._delete_message(message)
 
         key = message.text.replace('/decrypt', '', 1)
-        self._bot.send_message(
+        dm = self._bot.send_message(
             message.chat.id,
             f"Your message is:\n`{self._kim_service.get_note(key)}`"
         )
+        self._delete_message(dm, self._delete_time)
