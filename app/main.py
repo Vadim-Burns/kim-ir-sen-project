@@ -2,7 +2,7 @@ from signal import signal, SIGTERM, SIGINT
 
 import config
 from di import DI
-from endpoints import WebEndpoint, EndpointManager
+from endpoints import WebEndpoint, EndpointManager, TelegramEndpoint
 
 
 def init_endpoint_manager() -> EndpointManager:
@@ -14,6 +14,13 @@ def init_endpoint_manager() -> EndpointManager:
             host=config.FLASK_ADDR,
             port=config.FLASK_PORT
         )
+    )
+
+    # Telegram
+    endm.add_endpoint(
+       TelegramEndpoint(
+           token=config.TELEGRAM_BOT_TOKEN
+       )
     )
 
     return endm

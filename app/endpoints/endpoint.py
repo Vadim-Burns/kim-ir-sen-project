@@ -20,6 +20,7 @@ class EndpointManager:
         self._endpoint_procs = []
 
     def run(self):
+        multiprocessing.set_start_method('fork')
         for end in self._endpoints:
             print(f"Starting {end.get_name()} endpoint")
             pc = multiprocessing.Process(target=end.run)

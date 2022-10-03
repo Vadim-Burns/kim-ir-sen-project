@@ -24,7 +24,7 @@ class WebEndpoint(AbstractEndpoint):
 
     def _init_mapping(self):
         """
-        Initing flask url mapping
+        Init flask url mapping
         """
         # Web
         self._app.add_url_rule('/', None, self.index, methods=['GET'])
