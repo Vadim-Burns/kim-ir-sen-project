@@ -1,6 +1,9 @@
 import abc
+
+from entities import NoteEntity
+from repositories.database import AbstractNoteRepo
 from services import AbstractCryptService
-import db
+
 
 class AbstractKimService(abc.ABC):
 
@@ -23,18 +26,17 @@ class AbstractKimService(abc.ABC):
 
 class KimService(AbstractKimService):
 
-    def __init__(self, crypt_service: AbstractCryptService):
+    def __init__(self, crypt_service: AbstractCryptService, note_repo: AbstractNoteRepo):
         self._crypt_service = crypt_service
+        self._note_repo = note_repo
 
     def save_note(self, text: str) -> str:
         key = self._crypt_service.generate_key()
 
-        note_id = db.Note.create(
-            text=self._crypt_service.encrypt_text(
-                text=text,
-                key=key
-            )
+        note = NoteEntity(
+            text=self._crypt_service.encrypt_text(text, key)
         )
+        note_id = self._note_repo.save_instances(instances=[note])[0].id
 
         return self._crypt_service.encrypt_key(
             id=note_id,
@@ -46,11 +48,11 @@ class KimService(AbstractKimService):
         if note_id is None:
             return None
 
-        encrypted_text = db.Note.get_text_by_id(note_id)
-        if encrypted_text is None:
+        note = self._note_repo.get(id=note_id)
+        if note is None:
             return None
 
         return self._crypt_service.decrypt_text(
-            encrypted_text=encrypted_text,
+            encrypted_text=note.text,
             key=key
         )
