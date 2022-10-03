@@ -52,7 +52,11 @@ class KimService(AbstractKimService):
         if note is None:
             return None
 
-        return self._crypt_service.decrypt_text(
+        clear_text = self._crypt_service.decrypt_text(
             encrypted_text=note.text,
             key=key
         )
+
+        self._note_repo.delete(id=note_id)
+
+        return clear_text

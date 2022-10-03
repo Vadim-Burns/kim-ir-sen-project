@@ -2,11 +2,12 @@ from functools import wraps
 from typing import List
 from uuid import UUID
 
+from sqlalchemy import delete
 from sqlalchemy.orm.session import Session
 
 from entities import BaseEntity, NoteEntity
 from repositories.database import AbstractRepo, AbstractNoteRepo
-from repositories.database.connect import init_db_connection
+from repositories.database.alchemy.connect import init_db_connection
 
 SessionMaker = init_db_connection()
 
@@ -64,6 +65,12 @@ class AlchemyRepo(AbstractRepo):
     @session_maker
     def count(self, session: Session, **params) -> int:
         return session.query(self.entity).filter_by(**params).count()
+
+    @session_maker
+    def delete(self, session: Session, id: int) -> None:
+        sq = delete(self.entity).where(self.entity.id == id)
+        session.execute(sq)
+        session.commit()
 
 
 class NoteRepo(AbstractNoteRepo, AlchemyRepo):

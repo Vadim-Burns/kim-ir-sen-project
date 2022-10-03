@@ -1,10 +1,11 @@
+import time
+from threading import Thread
+
+import inject
 import telebot
 
 from endpoints import AbstractEndpoint
-import inject
 from services import AbstractKimService
-from threading import Thread
-import time
 
 
 class TelegramEndpoint(AbstractEndpoint):
@@ -114,6 +115,6 @@ class TelegramEndpoint(AbstractEndpoint):
         else:
             dm = self._bot.send_message(
                 message.chat.id,
-                f"Your message is:\n`{self._kim_service.get_note(key)}`"
+                f"Your message is:\n`{note}`"
             )
         self._delete_message(dm, self._delete_time)

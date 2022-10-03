@@ -53,6 +53,14 @@ class AbstractRepo(abc.ABC):
     ) -> None:
         ...
 
+    @abc.abstractmethod
+    def delete(
+            self,
+            id: int,
+            **params
+    ) -> None:
+        ...
+
 
 class AbstractNoteRepo(AbstractRepo):
     ...
