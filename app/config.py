@@ -6,7 +6,7 @@ import os
 
 # Flask config
 FLASK_PORT = os.environ.get('FLASK_PORT', 8080)
-FLASK_ADDR = os.environ.get('FLASK_ADDR', '127.0.0.1')
+FLASK_ADDR = os.environ.get('FLASK_ADDR', '0.0.0.0')
 FLASK_STATIC_FOLDER = os.path.join(os.getcwd() + "/endpoints/web/static")
 FLASK_TEMPLATE_FOLDER = os.path.join(os.getcwd() + "/endpoints/web/templates")
 
