@@ -10,6 +10,7 @@ Kim Ir Sen project provides ability to create small encrypted notes. This projec
 
 1. ``DATABASE_URL`` - url for connecting to database(example: ``postgress://user:password@host:port/name_of_db``)
 2. ``SECURITY_KEY`` - your main key for encrypting all note keys(example: ``ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=``)
+3. ``TELEGRAM_TOKEN`` - telegram bot token
 
 ## Getting Started
 
@@ -175,12 +176,13 @@ Returns json with decrypted note
   ```
 
 ## Deployment
-Try something like [docker-compose deployment](https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/)
+Using gitlab ci/cd and docker-compose
 
 ## Built With
 * [Flask](https://flask.palletsprojects.com/en/1.1.x/) - web framework used
 * [Peewee](http://docs.peewee-orm.com/en/latest/peewee/quickstart.html) - ORM for database
 * [Cryptography](https://cryptography.io/en/latest/) - library to encrypt/decrypt data
+* [PyTelegramBotApi](https://pypi.org/project/pyTelegramBotAPI/) - telegram api library
 
 ## Authors
 * **Vadim Tsindyaykin** - [Vadim-Burns](https://github.com/Vadim-Burns)
