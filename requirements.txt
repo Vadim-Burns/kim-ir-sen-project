@@ -12,7 +12,7 @@ MarkupSafe==2.1.1
 pycparser==2.21
 requests==2.28.1
 urllib3==1.26.12
-Werkzeug==2.2.2
+Werkzeug==2.2.3
 Inject==4.3.1
 pyTelegramBotAPI==4.4.0
 SQLAlchemy==1.4.26
